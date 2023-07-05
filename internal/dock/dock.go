@@ -9,7 +9,7 @@ import (
 )
 
 type Client struct {
-c *client.Client
+	c *client.Client
 }
 
 func NewClient(ctx context.Context) (*Client, error) {
@@ -44,6 +44,32 @@ func (c *Client) Clean(ctx context.Context) error {
 			return err
 		}
 	}
+
+	return nil
+}
+
+func (c *Client) CleanAll(ctx context.Context) error {
+	if err := c.Clean(ctx); err != nil {
+		return err
+	}
+	if err := c.PruneBuildCache(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Client) PruneBuildCache(ctx context.Context) error {
+	log.Println("Pruning build cache...")
+
+	report, err := c.c.BuildCachePrune(ctx, types.BuildCachePruneOptions{
+		All: true,
+	})
+	if err != nil {
+		return err
+	}
+
+	gigabytes := float64(report.SpaceReclaimed) / float64(10e8)
+	log.Printf("Total reclaimed space: %.2fGB\n", gigabytes)
 
 	return nil
 }
