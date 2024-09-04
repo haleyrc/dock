@@ -5,6 +5,8 @@ import (
 	"log"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 )
 
@@ -21,26 +23,26 @@ func NewClient(ctx context.Context) (*Client, error) {
 }
 
 func (c *Client) Clean(ctx context.Context) error {
-	containers, err := c.c.ContainerList(ctx, types.ContainerListOptions{All: true})
+	containers, err := c.c.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
 		return err
 	}
 
-	for _, container := range containers {
-		log.Printf("Removing container %s...\n", container.ID)
-		if err := c.c.ContainerRemove(ctx, container.ID, types.ContainerRemoveOptions{Force: true}); err != nil {
+	for _, cont := range containers {
+		log.Printf("Removing container %s...\n", cont.ID)
+		if err := c.c.ContainerRemove(ctx, cont.ID, container.RemoveOptions{Force: true}); err != nil {
 			return err
 		}
 	}
 
-	images, err := c.c.ImageList(ctx, types.ImageListOptions{All: true})
+	images, err := c.c.ImageList(ctx, image.ListOptions{All: true})
 	if err != nil {
 		return err
 	}
 
-	for _, image := range images {
-		log.Printf("Removing image %s...\n", image.ID)
-		if _, err := c.c.ImageRemove(ctx, image.ID, types.ImageRemoveOptions{Force: true, PruneChildren: true}); err != nil {
+	for _, img := range images {
+		log.Printf("Removing image %s...\n", img.ID)
+		if _, err := c.c.ImageRemove(ctx, img.ID, image.RemoveOptions{Force: true, PruneChildren: true}); err != nil {
 			return err
 		}
 	}
