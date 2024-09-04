@@ -30,6 +30,10 @@ func main() {
 		if err := c.CleanAll(ctx); err != nil {
 			panic(err)
 		}
+	case "list":
+		if err := c.List(ctx); err != nil {
+			panic(err)
+		}
 	case "help":
 		printUsage()
 		os.Exit(2)
@@ -43,7 +47,8 @@ func printUsage() {
 	fmt.Fprintln(os.Stderr, "Usage: dock COMMAND")
 	fmt.Fprintln(os.Stderr)
 	fmt.Fprintln(os.Stderr, "COMMANDS:")
-	fmt.Fprintln(os.Stderr, "\tclean\t\tKills and removes all containers and images")
-	fmt.Fprintln(os.Stderr, "\tcleanall\tSame as clean, but also prunes the build cache")
+	fmt.Fprintln(os.Stderr, "  clean    Kills and removes all containers and images")
+	fmt.Fprintln(os.Stderr, "  cleanall Same as clean, but also prunes the build cache")
+	fmt.Fprintln(os.Stderr, "  list     Lists all containers and images")
 	fmt.Fprintln(os.Stderr)
 }

@@ -2,6 +2,7 @@ package dock
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/docker/docker/api/types"
@@ -45,6 +46,35 @@ func (c *Client) Clean(ctx context.Context) error {
 		if _, err := c.c.ImageRemove(ctx, img.ID, image.RemoveOptions{Force: true, PruneChildren: true}); err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (c *Client) List(ctx context.Context) error {
+	containers, err := c.c.ContainerList(ctx, container.ListOptions{All: true})
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("CONTAINERS:")
+	for _, cont := range containers {
+		fmt.Printf("  * %s\n", cont.Image)
+	}
+	fmt.Println()
+
+	images, err := c.c.ImageList(ctx, image.ListOptions{All: true})
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("IMAGES:")
+	for _, img := range images {
+		id := img.ID
+		if len(img.RepoTags) > 0 {
+			id = img.RepoTags[0]
+		}
+		fmt.Printf("  * %s\n", id)
 	}
 
 	return nil
