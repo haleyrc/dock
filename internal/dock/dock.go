@@ -18,7 +18,7 @@ type Client struct {
 func NewClient(ctx context.Context) (*Client, error) {
 	c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("new client: %w", err)
 	}
 	return &Client{c: c}, nil
 }
@@ -26,25 +26,25 @@ func NewClient(ctx context.Context) (*Client, error) {
 func (c *Client) Clean(ctx context.Context) error {
 	containers, err := c.c.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
-		return err
+		return fmt.Errorf("client: clean: %w", err)
 	}
 
 	for _, cont := range containers {
 		log.Printf("Removing container %s...\n", cont.ID)
 		if err := c.c.ContainerRemove(ctx, cont.ID, container.RemoveOptions{Force: true}); err != nil {
-			return err
+			return fmt.Errorf("client: clean: %w", err)
 		}
 	}
 
 	images, err := c.c.ImageList(ctx, image.ListOptions{All: true})
 	if err != nil {
-		return err
+		return fmt.Errorf("client: clean: %w", err)
 	}
 
 	for _, img := range images {
 		log.Printf("Removing image %s...\n", img.ID)
 		if _, err := c.c.ImageRemove(ctx, img.ID, image.RemoveOptions{Force: true, PruneChildren: true}); err != nil {
-			return err
+			return fmt.Errorf("client: clean: %w", err)
 		}
 	}
 
@@ -54,7 +54,7 @@ func (c *Client) Clean(ctx context.Context) error {
 func (c *Client) List(ctx context.Context) error {
 	containers, err := c.c.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
-		return err
+		return fmt.Errorf("client: list: %w", err)
 	}
 
 	fmt.Println("CONTAINERS:")
@@ -65,7 +65,7 @@ func (c *Client) List(ctx context.Context) error {
 
 	images, err := c.c.ImageList(ctx, image.ListOptions{All: true})
 	if err != nil {
-		return err
+		return fmt.Errorf("client: list: %w", err)
 	}
 
 	fmt.Println("IMAGES:")
@@ -97,7 +97,7 @@ func (c *Client) PruneBuildCache(ctx context.Context) error {
 		All: true,
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("client: prune build cache: %w", err)
 	}
 
 	gigabytes := float64(report.SpaceReclaimed) / float64(10e8)
