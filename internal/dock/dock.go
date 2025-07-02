@@ -57,24 +57,32 @@ func (c *Client) List(ctx context.Context) error {
 		return fmt.Errorf("client: list: %w", err)
 	}
 
-	fmt.Println("CONTAINERS:")
-	for _, cont := range containers {
-		fmt.Printf("  * %s\n", cont.Image)
+	if len(containers) == 0 {
+		fmt.Println("No containers found.")
+	} else {
+		fmt.Println("CONTAINERS:")
+		for _, cont := range containers {
+			fmt.Printf("  * %s\n", cont.Image)
+		}
+		fmt.Println()
 	}
-	fmt.Println()
 
 	images, err := c.c.ImageList(ctx, image.ListOptions{All: true})
 	if err != nil {
 		return fmt.Errorf("client: list: %w", err)
 	}
 
-	fmt.Println("IMAGES:")
-	for _, img := range images {
-		id := img.ID
-		if len(img.RepoTags) > 0 {
-			id = img.RepoTags[0]
+	if len(images) == 0 {
+		fmt.Println("No images found.")
+	} else {
+		fmt.Println("IMAGES:")
+		for _, img := range images {
+			id := img.ID
+			if len(img.RepoTags) > 0 {
+				id = img.RepoTags[0]
+			}
+			fmt.Printf("  * %s\n", id)
 		}
-		fmt.Printf("  * %s\n", id)
 	}
 
 	return nil
