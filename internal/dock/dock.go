@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/build"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
@@ -101,7 +101,7 @@ func (c *Client) CleanAll(ctx context.Context) error {
 func (c *Client) PruneBuildCache(ctx context.Context) error {
 	log.Println("Pruning build cache...")
 
-	report, err := c.c.BuildCachePrune(ctx, types.BuildCachePruneOptions{
+	report, err := c.c.BuildCachePrune(ctx, build.CachePruneOptions{
 		All: true,
 	})
 	if err != nil {
